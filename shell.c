@@ -7,4 +7,15 @@
  *
  * Return: Number of commands and arguments
  */
+int parse_input(char *input, char **args)
+{
+	int index = 0;
 
+	args[index] = strtok(input, " ");
+	while (index < 10 && args[index] != NULL)
+	{
+		index++;
+		args[index] = strtok(NULL, " ");
+	}
+	return (index);
+}
