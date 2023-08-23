@@ -1,12 +1,11 @@
 #include "main.h"
 
 /**
- * parse_input - Parses user input into individual commands and arguments.
+ * parse_input - Parses user input into individual commands and arguments
+ * @input: User input to be parsed
+ * @args: Array of arguments
  *
- * @input: User input to be parsed.
- * @args: Array of arguments.
- *
- * Return: Number of commands and arguments (int).
+ * Return: Number of commands and arguments
  */
 
 int parse_input(char *input, char **args)
@@ -23,11 +22,10 @@ int parse_input(char *input, char **args)
 }
 
 /**
- * search_command - Searches and executes the specified command.
+ * search_command - Searches and executes the specified command
+ * @args: Array of arguments
  *
- * @args: Array of arguments.
- *
- * Return: void.
+ * Return: None
  */
 
 void search_command(char **args)
@@ -72,7 +70,7 @@ void search_command(char **args)
 /**
  * print_environment - Prints the current environment
  *
- * Return: void
+ * Return: None
  */
 
 void print_environment(void)
@@ -90,7 +88,7 @@ void print_environment(void)
 /**
  * main - Main function
  *
- * Return: Returns 0 (int).
+ * Return: Returns 0
  */
 
 int main(void)
