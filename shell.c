@@ -90,8 +90,9 @@ void print_environment(void)
 /**
  * main - Main function
  *
- * Return: (int) Always 0.
+ * Return: Returns 0 (int).
  */
+
 int main(void)
 {
 	char input[150];
@@ -123,9 +124,7 @@ int main(void)
 			search_command(args);
 		}
 		else
-		{
 			wait(NULL);
-		}
 	}
 	return (0);
 }
