@@ -1,144 +1,128 @@
 #include "main.h"
 
-#define MAX_INPUT_SIZE 1024
+/**
+ * parse_input - Parses user input into individual commands and arguments
+ * @input: User input to be parsed
+ * @args: Array of arguments
+ *
+ * Return: Number of commands and arguments
+ */
+
+int parse_input(char *input, char **args)
+{
+	int index = 0;
+
+	args[index] = strtok(input, " ");
+	while (index < 10 && args[index] != NULL)
+	{
+		index++;
+		args[index] = strtok(NULL, " ");
+	}
+	return (index);
+}
 
 /**
- * parse_input - Parse user input into arguments.
- * @input: User input to be parsed.
+ * search_command - Searches and executes the specified command
+ * @args: Array of arguments
  *
- * Return: Array of arguments (char **).
+ * Return: None
  */
-char **parse_input(char *input)
+
+void search_command(char **args)
 {
-	char **args = malloc(MAX_INPUT_SIZE * sizeof(char *));
-	char *token;
+	char *command, *path, *path_copy, *directory, *full_command;
+
+	command = strdup(args[0]);
+	if (command == NULL)
+		exit(1);
+
+	if (access(command, X_OK) == -1)
+	{
+		path = getenv("PATH");
+		path_copy = strdup(path);
+		directory = strtok(path_copy, ":");
+
+		while (directory != NULL)
+		{
+			full_command = malloc(strlen(directory) + strlen(command) + 2);
+			if (full_command == NULL)
+				exit(1);
+			sprintf(full_command, "%s/%s", directory, command);
+			if (access(full_command, X_OK) == 0)
+			{
+				args[0] = full_command;
+				break;
+			}
+			free(full_command);
+			directory = strtok(NULL, ":");
+		}
+		free(path_copy);
+		free(command);
+	}
+
+	if (execvp(args[0], args) == -1)
+	{
+		printf("%s: command not found\n", args[0]);
+		exit(1);
+	}
+}
+
+/**
+ * print_environment - Prints the current environment
+ *
+ * Return: None
+ */
+
+void print_environment(void)
+{
 	int index;
 
-	if (args == NULL)
-	{
-		perror("malloc");
-		exit(EXIT_FAILURE);
-	}
-
-	token = strtok(input, " ");
-
 	index = 0;
-
-	while (token != NULL)
+	while (environ[index] != NULL)
 	{
-		args[index] = token;
-		token = strtok(NULL, " ");
+		printf("%s\n", environ[index]);
 		index++;
 	}
-
-	args[index] = NULL;
-	return (args);
 }
 
 /**
- * get_path - Get the full path of a command.
- * @command: Command to find the full path for.
+ * main - Main function
  *
- * Return: Full path of the command (char *).
+ * Return: Returns 0
  */
-char *get_path(char *command)
-{
-	char *path = getenv("PATH");
-	char *path_copy = strdup(path);
-	char *directory = strtok(path_copy, ":");
 
-	while (directory != NULL)
-	{
-		char *full_command = malloc(strlen(directory) + strlen(command) + 2);
-
-		if (full_command == NULL)
-		{
-			free(path_copy);
-			return (NULL);
-		}
-		sprintf(full_command, "%s/%s", directory, command);
-		if (access(full_command, X_OK) == 0)
-		{
-			free(path_copy);
-			return (full_command);
-		}
-		free(full_command);
-		directory = strtok(NULL, ":");
-	}
-	free(path_copy);
-	return (NULL);
-}
-
-/**
- * execute_command - Execute a command with arguments.
- * @args: Array of arguments to execute.
- *
- * Return: Status of the execution (int).
- */
-int execute_command(char **args)
-{
-	pid_t pid = fork();
-
-	if (pid == -1)
-	{
-		perror("fork");
-		exit(EXIT_FAILURE);
-	}
-	else if (pid == 0)
-	{
-		if (execvp(args[0], args) == -1)
-		{
-			perror(args[0]);
-			exit(EXIT_FAILURE);
-		}
-	}
-	else
-	{
-		int status;
-
-		waitpid(pid, &status, 0);
-	}
-	return (0);
-}
-
-/**
- * main - Main function of the simple shell.
- *
- * Return: Exit status (int).
- */
 int main(void)
 {
-	char input[MAX_INPUT_SIZE];
-	char **args;
-	char *path;
+	char input[150];
+	char *args[20];
+	pid_t pid;
+	int count;
 
 	while (1)
 	{
-		printf("($) ");
-		if (fgets(input, MAX_INPUT_SIZE, stdin) == NULL)
-		{
-			printf("\n");
-			break;
-		}
-		input[strcspn(input, "\n")] = '\0';
+		if (fgets(input, 150, stdin) == NULL)
+			exit(0);
+
+		input[strcspn(input, "\n")] = 0;
+
 		if (strcmp(input, "exit") == 0)
 			break;
-
-		args = parse_input(input);
-
-		if (args[0] == NULL)
-			continue;
-		if (strcmp(args[0], "env") == 0)
-			continue;
-		path = get_path(args[0]);
-
-		if (path == NULL)
+		else if (strcmp(input, "env") == 0)
 		{
-			printf("%s: command not found\n", args[0]);
+			print_environment();
 			continue;
 		}
-		execute_command(args);
-		free(args);
+
+		pid = fork();
+		if (pid == 0)
+		{
+			count = parse_input(input, args);
+			args[count] = NULL;
+
+			search_command(args);
+		}
+		else
+			wait(NULL);
 	}
 	return (0);
 }
