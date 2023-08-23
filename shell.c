@@ -7,7 +7,6 @@
  *
  * Return: Number of commands and arguments
  */
-
 int parse_input(char *input, char **args)
 {
 	int index = 0;
@@ -27,7 +26,6 @@ int parse_input(char *input, char **args)
  *
  * Return: None
  */
-
 void search_command(char **args)
 {
 	char *command, *path, *path_copy, *directory, *full_command;
@@ -72,7 +70,6 @@ void search_command(char **args)
  *
  * Return: None
  */
-
 void print_environment(void)
 {
 	int index;
@@ -90,7 +87,6 @@ void print_environment(void)
  *
  * Return: Returns 0
  */
-
 int main(void)
 {
 	char input[150];
@@ -100,7 +96,8 @@ int main(void)
 
 	while (1)
 	{
-		if (fgets(input, 150, stdin) == NULL)
+		printf("#cisfun$ ");
+		if (fgets(input, sizeof(input), stdin) == NULL)
 			exit(0);
 
 		input[strcspn(input, "\n")] = 0;
