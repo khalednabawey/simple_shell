@@ -66,3 +66,21 @@ void search_command(char **args)
 		exit(1);
 	}
 }
+
+/**
+ * print_environment - Prints the current environment
+ *
+ * Return: None
+ */
+
+void print_environment(void)
+{
+	int index;
+
+	index = 0;
+	while (environ[index] != NULL)
+	{
+		printf("%s\n", environ[index]);
+		index++;
+	}
+}
